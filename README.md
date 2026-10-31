@@ -13,13 +13,15 @@ Type a subject (e.g. *Biology*) and Gemma 4 generates a "constellation" of about
 1. [What it does](#1-what-it-does)
 2. [Tech stack](#2-tech-stack)
 3. [Prerequisites](#3-prerequisites)
-4. [Team setup (do this first)](#4-team-setup-do-this-first)
+4. [Team setup](#4-team-setup)
 5. [Architecture](#5-architecture)
 6. [Build plan, step by step](#6-build-plan-step-by-step)
 7. [Prompts and JSON contracts](#7-prompts-and-json-contracts)
 8. [Work split for three people](#8-work-split-for-three-people)
 9. [Prize checklist](#9-prize-checklist)
 10. [Open decisions](#10-open-decisions)
+
+> **Status (31 Oct):** The team builds in **C# / Blazor (.NET 10)**. The .NET solution is scaffolded (template code only). The repo also holds an earlier **TypeScript prototype** (`server.ts`, `src/*.tsx`), which already works end to end with local Gemma 4 through Ollama. It is being ported to C# and is not extended further; see [Prototype reference](#prototype-reference).
 
 > **Note:** This file is the working plan. Before submitting, replace sections 4 to 10 with the final "How to run" and "Model and licence" sections (see the prize checklist).
 
@@ -42,10 +44,10 @@ All C#, one solution, one language for the whole team.
 
 | Layer | Choice | Why |
 |---|---|---|
-| Runtime | .NET 8 (LTS) or newer | Everyone can install it on any OS |
+| Runtime | **.NET 10 (LTS)**, projects target `net10.0`, SDK pinned in `global.json` | Current LTS, and everyone can install it on any OS |
 | UI | **Blazor Server** with SVG rendering | No JavaScript build step, easy glow effects via SVG filters, C# end to end |
 | AI client | [OllamaSharp](https://github.com/awaescher/OllamaSharp) (NuGet) | Typed C# client for the Ollama API. Fallback: plain `HttpClient` against `http://localhost:11434` |
-| Model | **Gemma 4** via Ollama | Open-weight, runs locally |
+| Model | **Gemma 4** (`gemma4:e2b`) via Ollama | Open-weight, runs locally; e2b is the fastest |
 | Layout | Small force-directed layout written by us in C# | Keeps hubs apart and pulls shared stars between their parents |
 | Tests | xUnit | For graph merging and JSON parsing |
 
@@ -57,7 +59,7 @@ All C#, one solution, one language for the whole team.
 
 Everyone installs:
 
-- [.NET SDK 8+](https://dotnet.microsoft.com/download) (`dotnet --version`)
+- [.NET SDK 10](https://dotnet.microsoft.com/download) (`dotnet --version` should print `10.0.x`; older SDKs are rejected by `global.json`)
 - [Git](https://git-scm.com/) and a GitHub account
 - [Ollama](https://ollama.com/download) (`ollama --version`)
 - An IDE of choice (Visual Studio, Rider, VS Code with C# Dev Kit) and optionally an AI coding agent
@@ -80,40 +82,42 @@ ollama run gemma4:e2b "List 7 sub-fields of Biology as a comma-separated list."
 
 ---
 
-## 4. Team setup (do this first)
+## 4. Team setup
 
-One person does steps 1 to 4, the rest clone.
+Status of the one-time setup:
 
-1. **Create the repo** on GitHub: `constellations`, **public**, add a `.gitignore` (Visual Studio / .NET template) and the **licence** (Apache-2.0 or MIT; a public repo without a licence does not qualify for the prize).
-2. **Add collaborators** (Settings → Collaborators) for the other two members.
-3. **Protect `main`** (optional but useful): require pull requests, no direct pushes.
-4. **Scaffold the solution** and push:
+1. ✅ **Repo created:** [github.com/dave1433/Constellations](https://github.com/dave1433/Constellations), public. Ownership moved from `Lucaz2010` to `dave1433`. If your clone still points at the old URL, run `git remote set-url origin https://github.com/dave1433/Constellations.git`.
+2. ✅ **Collaborators added:** `Lucaz2010` and `davide-jorge` (write access).
+3. ✅ **`main` is protected** by the **Protect main** ruleset: PR with 1 approval required, no force pushes, no deletion, no bypass.
+4. ✅ **Solution scaffolded:** `Constellations.slnx` with Core (class library + OllamaSharp), Web (Blazor, interactive server) and Tests (xUnit), all on `net10.0`.
+5. ✅ **`.gitignore`** covers .NET build output, IDE files and secrets (`.env*`).
+6. ✅ **`LICENSE` file:** **MIT** (added in #9). The prize requires an open-source licence in the public repo.
 
-   ```bash
-   dotnet new sln -n Constellations
-   dotnet new blazor -n Constellations.Web -int Server -o src/Constellations.Web
-   dotnet new classlib -n Constellations.Core -o src/Constellations.Core
-   dotnet new xunit -n Constellations.Tests -o tests/Constellations.Tests
-   dotnet sln add src/Constellations.Web src/Constellations.Core tests/Constellations.Tests
-   dotnet add src/Constellations.Web reference src/Constellations.Core
-   dotnet add tests/Constellations.Tests reference src/Constellations.Core
-   dotnet add src/Constellations.Core package OllamaSharp
-   ```
+New team member? Clone, then:
 
-   > Template flags change between SDK versions. If `-int Server` is rejected, run `dotnet new blazor --help`.
+```bash
+dotnet build && dotnet test
+ollama pull gemma4:e2b
+dotnet run --project src/Constellations.Web   # http://localhost:5203
+```
 
-5. **Workflow:** short-lived branches (`feat/ollama-service`, `feat/graph-merge`, `feat/svg-view`), small PRs, one reviewer each. Commit early and often, since judges look for substantial work by the team.
+**Workflow (mandatory):** never push to `main`. Create a branch from an up-to-date `main` (`feat/ollama-service`, `feat/graph-merge`, `feat/svg-view`, …), push it and open a PR with one reviewer. Keep PRs small and commit often, since judges look for substantial work by the team. Secrets go only in git-ignored `.env` files. See `CLAUDE.md` for the full rules.
 
-Suggested layout:
+Current layout:
 
 ```
-constellations/
+Constellations/
+├── Constellations.slnx           # .NET 10 solution (XML format)
+├── global.json                   # pins the .NET 10 SDK
 ├── src/
 │   ├── Constellations.Core/      # models, Ollama service, graph merge, layout
-│   └── Constellations.Web/       # Blazor UI (SVG canvas, side panel)
+│   ├── Constellations.Web/       # Blazor UI (SVG canvas, side panel)
+│   └── *.tsx, components/, …     # TypeScript prototype (to be removed after porting)
 ├── tests/Constellations.Tests/
-├── docs/                         # screenshots / demo GIF
-├── LICENSE
+├── server.ts, package.json, …    # TypeScript prototype (to be removed after porting)
+├── docs/                         # screenshots / demo GIF (to add)
+├── LICENSE                       # MIT
+├── CLAUDE.md                     # rules for AI coding agents
 └── README.md
 ```
 
@@ -155,6 +159,7 @@ public class Concept
 - Use Ollama **structured outputs**: pass a JSON schema in the request's `format` field so the model returns valid JSON only.
 - Set `temperature` low (0.2 to 0.4) and set `num_ctx`.
 - Test from a tiny console app or xUnit test with the input `Biology` and print the result.
+- **Port from the prototype:** `server.ts` (`askOllama` / `askJson`) already does this in TypeScript. It calls `POST /api/chat` with `format: "json"`, sets `num_ctx: 4096`, uses a 180 s timeout, retries once on invalid or wrongly shaped JSON, and fails fast with a clear message when Ollama is unreachable or returns an error.
 - **Done when:** the same call returns parseable JSON with ~7 concepts reliably.
 
 ### Step 2: Graph model and merging
@@ -164,7 +169,7 @@ public class Concept
 - **Done when:** merging is deterministic and tested.
 
 ### Step 3: Configuration
-- `appsettings.json`: `Ollama:BaseUrl` (default `http://localhost:11434`), `Ollama:Model` (default `gemma4:e2b`), `Ollama:NumCtx`.
+- `appsettings.json`: `Ollama:BaseUrl` (default `http://localhost:11434`), `Ollama:Model` (default `gemma4:e2b`), `Ollama:NumCtx` (4096, as in the prototype).
 - Register services with dependency injection in `Program.cs`.
 
 ### Step 4: Static visual with fake data
@@ -258,6 +263,16 @@ Tips:
 - Validate the output in C# (non-empty names, de-duplicate, cap counts) rather than trusting the model.
 - If results vary too much between runs, lower the temperature or add a fixed `seed` in the Ollama options.
 
+### Prototype reference
+
+The TypeScript prototype's prompts drifted from the contracts above. Pick one before porting (see open decision 6):
+
+| | Plan above | Prototype (`server.ts`) |
+|---|---|---|
+| Concepts per subject | 7, `{ name, description }` | 6, `{ name, description (≤20 words), subConcepts[3], also_in[1–2] }` plus a subject `description` |
+| Bridge | `{ explanation, bridge: { name, description }, subConcepts: [{ name, description }] }` | `{ bridgeConcept, explanation, subConcepts: string[3], realWorldImpact }` |
+| Output control | JSON schema in `format` | `format: "json"` + shape validation in code |
+
 ---
 
 ## 8. Work split for three people
@@ -279,8 +294,8 @@ Suggested rhythm: scaffold together → work in parallel on steps 1, 2 and 4 →
 Based on the Best Open-Source AI Project rules:
 
 - [ ] Open-weight AI is central to the app (Gemma 4 generates all concepts and connections)
-- [ ] Public GitHub repository
-- [ ] `LICENSE` file present (open-source licence)
+- [x] Public GitHub repository
+- [x] `LICENSE` file present (MIT)
 - [ ] README explains **what we built**, **how to run it**, and **which model and key dependencies** we used
 - [ ] README **names the model and links its licence/terms** (Gemma 4 and Ollama)
 - [ ] Someone outside the team can clone, follow the README and run it
@@ -298,5 +313,8 @@ Settle these early:
 1. ~~**Model tag:**~~ **Decided: `gemma4:e2b`** (fastest; chosen for demo responsiveness).
 2. **Click-to-expand meaning:** toggle a hub's visible stars, or also promote a star into its own hub (recommended: both, with double-click for promotion).
 3. **Subject limit:** cap at ~5 subjects on screen to keep the map readable.
-4. **Licence:** Apache-2.0 or MIT.
+4. ~~**Licence:**~~ **Decided: MIT.**
 5. **Demo fallback:** keep an exported JSON of the demo map in case Ollama misbehaves on stage.
+6. **Concept contract:** keep the plan's flat 7 concepts, or adopt the prototype's richer 6 concepts with sub-concepts and `also_in` (see [Prototype reference](#prototype-reference)).
+7. **Removing the TypeScript prototype:** when, i.e. once the Blazor app reaches feature parity.
+8. ~~**Stack:**~~ **Decided: C# / Blazor**, porting the TypeScript prototype.
