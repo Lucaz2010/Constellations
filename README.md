@@ -91,7 +91,7 @@ Status of the one-time setup:
 3. ✅ **`main` is protected** by the **Protect main** ruleset: PR with 1 approval required, no force pushes, no deletion, no bypass.
 4. ✅ **Solution scaffolded:** `Constellations.slnx` with Core (class library + OllamaSharp), Web (Blazor, interactive server) and Tests (xUnit), all on `net10.0`.
 5. ✅ **`.gitignore`** covers .NET build output, IDE files and secrets (`.env*`).
-6. ⬜ **`LICENSE` file:** still missing. Choose Apache-2.0 or MIT (see open decisions). A public repo without a licence does not qualify for the prize.
+6. ✅ **`LICENSE` file:** **MIT** (added in #9). The prize requires an open-source licence in the public repo.
 
 New team member? Clone, then:
 
@@ -116,7 +116,7 @@ Constellations/
 ├── tests/Constellations.Tests/
 ├── server.ts, package.json, …    # TypeScript prototype (to be removed after porting)
 ├── docs/                         # screenshots / demo GIF (to add)
-├── LICENSE                       # to add
+├── LICENSE                       # MIT
 ├── CLAUDE.md                     # rules for AI coding agents
 └── README.md
 ```
@@ -295,7 +295,7 @@ Based on the Best Open-Source AI Project rules:
 
 - [ ] Open-weight AI is central to the app (Gemma 4 generates all concepts and connections)
 - [x] Public GitHub repository
-- [ ] `LICENSE` file present (open-source licence)
+- [x] `LICENSE` file present (MIT)
 - [ ] README explains **what we built**, **how to run it**, and **which model and key dependencies** we used
 - [ ] README **names the model and links its licence/terms** (Gemma 4 and Ollama)
 - [ ] Someone outside the team can clone, follow the README and run it
@@ -313,7 +313,7 @@ Settle these early:
 1. ~~**Model tag:**~~ **Decided: `gemma4:e2b`** (fastest; chosen for demo responsiveness).
 2. **Click-to-expand meaning:** toggle a hub's visible stars, or also promote a star into its own hub (recommended: both, with double-click for promotion).
 3. **Subject limit:** cap at ~5 subjects on screen to keep the map readable.
-4. **Licence:** Apache-2.0 or MIT.
+4. ~~**Licence:**~~ **Decided: MIT.**
 5. **Demo fallback:** keep an exported JSON of the demo map in case Ollama misbehaves on stage.
 6. **Concept contract:** keep the plan's flat 7 concepts, or adopt the prototype's richer 6 concepts with sub-concepts and `also_in` (see [Prototype reference](#prototype-reference)).
 7. **Removing the TypeScript prototype:** when, i.e. once the Blazor app reaches feature parity.
