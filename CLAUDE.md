@@ -21,24 +21,25 @@ Built for the Hacktoberfest Hack Day **Best Open-Source AI Project** challenge. 
 The plan is **C# / .NET + Blazor**. The repo currently also contains a **TypeScript prototype** exported from Google AI Studio (`server.ts`, `src/*.tsx`, `package.json`, `vite.config.ts`, `index.html`, `metadata.json`, `bun.lock`, `.env.example`, `public/assets/aistudio/`). That prototype defaults to Gemini cloud and is **not** the target stack.
 
 - Do not extend the TypeScript prototype. Use it only as a reference for UX ideas and prompt wording.
-- The .NET solution has not been scaffolded yet (see "Scaffolding" below).
+- The .NET solution is scaffolded (template code only: `Class1.cs`, `UnitTest1.cs`, Counter/Weather pages). Replace the placeholders as real code lands.
 - Removing or moving the prototype is a team decision. Ask before deleting it.
 
 ## Tech stack
 
 | Layer | Choice |
 |---|---|
-| Runtime | .NET 8 (LTS) or newer |
+| Runtime | **.NET 10 (LTS)**: all projects target `net10.0`, and `global.json` pins SDK 10.0.x (`rollForward: latestFeature`) |
 | UI | Blazor Server (interactive server render mode), rendering with **SVG** (no JS build step) |
 | AI client | [OllamaSharp](https://github.com/awaescher/OllamaSharp). Fallback: plain `HttpClient` against `http://localhost:11434` |
 | Model | Gemma 4 via Ollama (**`gemma4:e2b`**, team decision for speed; configurable) |
 | Layout | Custom force-directed layout in C# |
 | Tests | xUnit |
 
-## Project layout (target)
+## Project layout
 
 ```
-Constellations.sln
+Constellations.slnx       # .NET 10 XML solution format (not .sln)
+global.json               # pins the .NET 10 SDK
 src/
   Constellations.Core/    # models, IConstellationAi + Ollama impl, GraphModel, normalisation, LayoutEngine
   Constellations.Web/     # Blazor UI: ConstellationCanvas.razor (SVG), side panel, Program.cs DI
@@ -51,22 +52,22 @@ README.md
 
 `Constellations.Core` must not depend on Blazor/ASP.NET. Keep the UI thin.
 
-## Scaffolding
+## Prerequisites
 
-If the solution doesn't exist yet:
+- **.NET 10 SDK** (`dotnet --version` should print `10.0.x`). Older SDKs fail because of `global.json` and `net10.0`.
+- Ollama with a Gemma 4 model pulled (see below).
+
+## Adding projects or packages
+
+The solution already exists. Don't re-scaffold it. To add to it:
 
 ```bash
-dotnet new sln -n Constellations
-dotnet new blazor -n Constellations.Web -int Server -o src/Constellations.Web
-dotnet new classlib -n Constellations.Core -o src/Constellations.Core
-dotnet new xunit -n Constellations.Tests -o tests/Constellations.Tests
-dotnet sln add src/Constellations.Web src/Constellations.Core tests/Constellations.Tests
-dotnet add src/Constellations.Web reference src/Constellations.Core
-dotnet add tests/Constellations.Tests reference src/Constellations.Core
-dotnet add src/Constellations.Core package OllamaSharp
+dotnet new classlib -n Constellations.Something -o src/Constellations.Something
+dotnet sln Constellations.slnx add src/Constellations.Something
+dotnet add src/Constellations.Core package <PackageName>
 ```
 
-If `-int Server` is rejected, check `dotnet new blazor --help` (flags vary by SDK version). The root `.gitignore` already covers .NET build output and secrets.
+Keep new projects on `net10.0`. Never commit `bin/` or `obj/`; the root `.gitignore` covers them, and also covers secrets.
 
 ## Common commands
 
@@ -74,7 +75,7 @@ If `-int Server` is rejected, check `dotnet new blazor --help` (flags vary by SD
 dotnet build
 dotnet test
 dotnet test --filter "FullyQualifiedName~GraphModel"   # single test class
-dotnet run --project src/Constellations.Web
+dotnet run --project src/Constellations.Web             # http://localhost:5203
 dotnet watch --project src/Constellations.Web          # hot reload
 
 ollama pull gemma4:e2b
