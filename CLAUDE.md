@@ -20,7 +20,7 @@ Built for the Hacktoberfest Hack Day **Best Open-Source AI Project** challenge. 
 
 The team decided on **C# / .NET + Blazor**. The repo also contains a **TypeScript prototype**, originally exported from Google AI Studio (`server.ts`, `src/*.tsx`, `package.json`, `vite.config.ts`, `index.html`, `bun.lock`, `.env.example`, `public/assets/aistudio/`). It runs on local Gemma 4 through Ollama (no cloud AI) and is being **ported to C#**. It is **not** the target stack.
 
-- Do not extend the TypeScript prototype. Use it only as a reference for UX ideas and prompt wording.
+- **Team decision (31 Oct): build demo features in the TypeScript prototype now, port them to Blazor later.** The prototype is what we demo at the hackathon. Keep its features documented so the port has a spec.
 - The .NET solution is scaffolded (template code only: `Class1.cs`, `UnitTest1.cs`, Counter/Weather pages). Replace the placeholders as real code lands.
 - Removing or moving the prototype is a team decision. Ask before deleting it.
 

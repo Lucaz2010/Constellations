@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   ConstellationNode,
   ConstellationEdge,
@@ -157,7 +157,7 @@ export default function App() {
                   type: 'subconcept',
                   subject: result.subject,
                   parentId: branchId,
-                  description: `${subName} is a specific focus area within ${concept.name}.`,
+                  description: '', // filled in by the deep dive when selected
                   color: '#64748B',
                   x: subX,
                   y: subY,
@@ -345,6 +345,18 @@ export default function App() {
   // CHANGED: removed the useEffect that auto-generated "Black Holes" on startup
   // (it wasted a model call every time the page loaded).
 
+  // Names from the subject down to the selected node, e.g. ["Computer Science", "Data Structures", "Trees"]
+  const selectedPath = useMemo(() => {
+    const names: string[] = [];
+    const byId = new Map(nodes.map((n) => [n.id, n]));
+    let cur: ConstellationNode | undefined = selectedNode ?? undefined;
+    for (let depth = 0; cur && depth < 6; depth++) {
+      names.unshift(cur.name);
+      cur = cur.parentId ? byId.get(cur.parentId) : undefined;
+    }
+    return names;
+  }, [nodes, selectedNode]);
+
   return (
       <div className="flex h-screen w-screen overflow-hidden bg-[#080E1E] text-slate-100 font-['Plus_Jakarta_Sans',sans-serif]">
         {/* Left Sidebar */}
@@ -388,6 +400,7 @@ export default function App() {
         {selectedNode && (
             <RightSidebar
                 node={selectedNode}
+                topicPath={selectedPath}
                 onClose={() => setSelectedNode(null)}
                 onCompleteNode={handleCompleteNode}
                 onDeleteNode={handleDeleteNode}
