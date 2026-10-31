@@ -62,22 +62,20 @@ Everyone installs:
 - [Ollama](https://ollama.com/download) (`ollama --version`)
 - An IDE of choice (Visual Studio, Rider, VS Code with C# Dev Kit) and optionally an AI coding agent
 
-Pull a Gemma 4 model:
+Pull the team's Gemma 4 model:
 
 ```bash
-ollama pull gemma4:e4b     # small, good default for laptops
-# or, if your hardware allows:
-ollama pull gemma4:12b
+ollama pull gemma4:e2b     # team choice: smallest and fastest, keeps the demo responsive
 ```
 
-Check the available tags at `ollama.com/library/gemma4` and sizes with `ollama list`. **Agree on one model tag as a team** so everyone sees the same output, and make it configurable (see step 3 below).
+**Decided:** the team uses **`gemma4:e2b`** so everyone sees the same output and the live demo stays fast. The tag is still configurable (see step 3), so a bigger model (e.g. `gemma4:e4b`) can be tried locally without code changes. Check sizes with `ollama list`.
 
 > ⚠️ **Context window gotcha:** Ollama may default Gemma 4 to a small context window (reported as 4K). Our prompts are short, but set `num_ctx` explicitly in the request options so behaviour is predictable.
 
 Smoke test:
 
 ```bash
-ollama run gemma4:e4b "List 7 sub-fields of Biology as a comma-separated list."
+ollama run gemma4:e2b "List 7 sub-fields of Biology as a comma-separated list."
 ```
 
 ---
@@ -166,7 +164,7 @@ public class Concept
 - **Done when:** merging is deterministic and tested.
 
 ### Step 3: Configuration
-- `appsettings.json`: `Ollama:BaseUrl` (default `http://localhost:11434`), `Ollama:Model` (e.g. `gemma4:e4b`), `Ollama:NumCtx`.
+- `appsettings.json`: `Ollama:BaseUrl` (default `http://localhost:11434`), `Ollama:Model` (default `gemma4:e2b`), `Ollama:NumCtx`.
 - Register services with dependency injection in `Program.cs`.
 
 ### Step 4: Static visual with fake data
@@ -297,7 +295,7 @@ Final README should include at least: description + screenshot, requirements, in
 
 Settle these early:
 
-1. **Model tag:** `gemma4:e4b` vs `gemma4:12b` (speed vs quality on the demo machine).
+1. ~~**Model tag:**~~ **Decided: `gemma4:e2b`** (fastest; chosen for demo responsiveness).
 2. **Click-to-expand meaning:** toggle a hub's visible stars, or also promote a star into its own hub (recommended: both, with double-click for promotion).
 3. **Subject limit:** cap at ~5 subjects on screen to keep the map readable.
 4. **Licence:** Apache-2.0 or MIT.

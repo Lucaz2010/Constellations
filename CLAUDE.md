@@ -31,7 +31,7 @@ The plan is **C# / .NET + Blazor**. The repo currently also contains a **TypeScr
 | Runtime | .NET 8 (LTS) or newer |
 | UI | Blazor Server (interactive server render mode), rendering with **SVG** (no JS build step) |
 | AI client | [OllamaSharp](https://github.com/awaescher/OllamaSharp). Fallback: plain `HttpClient` against `http://localhost:11434` |
-| Model | Gemma 4 via Ollama (default tag `gemma4:e4b`, configurable) |
+| Model | Gemma 4 via Ollama (**`gemma4:e2b`**, team decision for speed; configurable) |
 | Layout | Custom force-directed layout in C# |
 | Tests | xUnit |
 
@@ -77,9 +77,9 @@ dotnet test --filter "FullyQualifiedName~GraphModel"   # single test class
 dotnet run --project src/Constellations.Web
 dotnet watch --project src/Constellations.Web          # hot reload
 
-ollama pull gemma4:e4b
+ollama pull gemma4:e2b
 ollama list
-ollama run gemma4:e4b "List 7 sub-fields of Biology as a comma-separated list."
+ollama run gemma4:e2b "List 7 sub-fields of Biology as a comma-separated list."
 ```
 
 ## Architecture
@@ -122,7 +122,7 @@ SVG on a dark background. Hubs are large coloured circles, stars small circles, 
 `appsettings.json` (bind to an options class, register via DI in `Program.cs`):
 
 ```json
-"Ollama": { "BaseUrl": "http://localhost:11434", "Model": "gemma4:e4b", "NumCtx": 4096 }
+"Ollama": { "BaseUrl": "http://localhost:11434", "Model": "gemma4:e2b", "NumCtx": 4096 }
 ```
 
 Never hard-code the model tag or URL. The app itself needs no API keys. If a secret is ever needed, it goes in `.env` (see "Secrets"), never in `appsettings.json`.
@@ -170,4 +170,4 @@ If you find yourself on `main` with changes, move them to a new branch before co
 
 ## Open decisions
 
-Model tag (`gemma4:e4b` vs `gemma4:12b`), click-to-expand semantics (also double-click to promote a star to a hub?), subject cap, licence choice, and what to do with the TypeScript prototype. Don't settle these on your own. Ask.
+Click-to-expand semantics (also double-click to promote a star to a hub?), subject cap, licence choice, and what to do with the TypeScript prototype. Don't settle these on your own. Ask.
