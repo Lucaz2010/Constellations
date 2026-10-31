@@ -84,7 +84,7 @@ export interface ConstellationGenerationResult {
   isOfflineFallback?: boolean;
 }
 
-export type AIProvider = 'gemma-local' | 'gemini-cloud' | 'instant-cache';
+export type AIProvider = 'gemma-local' | 'instant-cache';
 
 export interface AISettings {
   provider: AIProvider;

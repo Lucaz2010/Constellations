@@ -18,7 +18,7 @@ Built for the Hacktoberfest Hack Day **Best Open-Source AI Project** challenge. 
 
 ## Current repo state (important)
 
-The plan is **C# / .NET + Blazor**. The repo currently also contains a **TypeScript prototype** exported from Google AI Studio (`server.ts`, `src/*.tsx`, `package.json`, `vite.config.ts`, `index.html`, `metadata.json`, `bun.lock`, `.env.example`, `public/assets/aistudio/`). That prototype defaults to Gemini cloud and is **not** the target stack.
+The team decided on **C# / .NET + Blazor**. The repo also contains a **TypeScript prototype**, originally exported from Google AI Studio (`server.ts`, `src/*.tsx`, `package.json`, `vite.config.ts`, `index.html`, `bun.lock`, `.env.example`, `public/assets/aistudio/`). It runs on local Gemma 4 through Ollama (no cloud AI) and is being **ported to C#**. It is **not** the target stack.
 
 - Do not extend the TypeScript prototype. Use it only as a reference for UX ideas and prompt wording.
 - The .NET solution is scaffolded (template code only: `Class1.cs`, `UnitTest1.cs`, Counter/Weather pages). Replace the placeholders as real code lands.
@@ -46,7 +46,7 @@ src/
 tests/
   Constellations.Tests/   # xUnit: graph merge, normalisation, JSON parsing/validation, layout sanity
 docs/                     # screenshots / demo GIF
-LICENSE
+LICENSE                   # MIT
 README.md
 ```
 
@@ -164,11 +164,11 @@ If you find yourself on `main` with changes, move them to a new branch before co
 
 ## Submission requirements (don't break these)
 
-- Public repo with a `LICENSE` file (Apache-2.0 or MIT, still to be decided).
+- Public repo with a `LICENSE` file: **MIT** (team decision). Don't change or remove it.
 - The final README must cover what we built, how to run it (`ollama pull …`, `dotnet run`), configuration, the model with a link to its licence (Gemma 4 and Ollama/MIT), dependencies, and a "How it uses AI" section. Before submitting, replace the planning sections (README §4–10).
 - Someone outside the team must be able to clone the repo and run it from the README alone.
 - Demo fallback: **Export/Import JSON** of a map so the demo doesn't depend on a live model call.
 
 ## Open decisions
 
-Click-to-expand semantics (also double-click to promote a star to a hub?), subject cap, licence choice, and what to do with the TypeScript prototype. Don't settle these on your own. Ask.
+Click-to-expand semantics (also double-click to promote a star to a hub?), subject cap, and when to remove the TypeScript prototype. Don't settle these on your own. Ask.
