@@ -7,12 +7,49 @@ import {
   AISettings,
   BridgeResult,
   ConstellationGenerationResult,
+  DeepDive,
 } from '../types/constellation';
 
 const constellationCache = new Map<string, ConstellationGenerationResult>();
 const bridgeCache = new Map<string, BridgeResult>();
+const deepDiveCache = new Map<string, DeepDive>();
+const deepDiveKey = (path: string[]) => path.map((p) => p.trim().toLowerCase()).join(' > ');
 
 export class AIService {
+  // In-depth explanation of the last topic in `path` (e.g. ["Computer Science", "Data Structures", "Trees"]).
+  // Cached per path, so re-opening a star is instant. Pass a signal to cancel when the user clicks away.
+  public static cachedDeepDive(path: string[]): DeepDive | undefined {
+    return deepDiveCache.get(deepDiveKey(path));
+  }
+
+  public static async deepDive(path: string[], signal?: AbortSignal): Promise<DeepDive> {
+    const key = deepDiveKey(path);
+    const cached = deepDiveCache.get(key);
+    if (cached) return cached;
+
+    const res = await fetch('/api/ai/deepdive', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path }),
+      signal,
+    });
+    const raw = await res.json();
+    if (!res.ok || raw.error) throw new Error(raw.error || 'Deep dive failed');
+
+    const text = (x: unknown) => (typeof x === 'string' ? x.trim() : '');
+    const list = (x: unknown, max: number) =>
+        Array.isArray(x) ? x.map(text).filter(Boolean).slice(0, max) : [];
+    const result: DeepDive = {
+      overview: text(raw.overview),
+      keyIdeas: list(raw.keyIdeas, 6),
+      example: text(raw.example),
+      whyItMatters: text(raw.whyItMatters),
+      related: list(raw.related, 5),
+    };
+    deepDiveCache.set(key, result);
+    return result;
+  }
+
   // Generate constellation directly from the model for ANY subject
   public static async generateConstellation(
       subject: string,

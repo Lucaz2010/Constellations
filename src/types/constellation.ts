@@ -76,6 +76,15 @@ export interface ConceptBranch {
   quiz?: ConceptQuiz;
 }
 
+// In-depth explanation of one concept, generated on demand when it is selected
+export interface DeepDive {
+  overview: string;
+  keyIdeas: string[];
+  example: string;
+  whyItMatters: string;
+  related: string[];
+}
+
 export interface ConstellationGenerationResult {
   subject: string;
   description: string;
