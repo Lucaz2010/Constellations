@@ -15,64 +15,35 @@ const bridgeCache = new Map<string, BridgeResult>();
 export class AIService {
   // Generate constellation directly from the model for ANY subject
   public static async generateConstellation(
-    subject: string,
-    settings: AISettings
+      subject: string,
+      settings: AISettings
   ): Promise<ConstellationGenerationResult> {
     const key = subject.trim().toLowerCase();
-    if (constellationCache.has(key)) {
-      return constellationCache.get(key)!;
+    if (constellationCache.has(key)) return constellationCache.get(key)!;
+
+    const res = await fetch('/api/ai/constellation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subject }),
+    });
+    const rawJson = await res.json();
+    if (!res.ok || rawJson.error) {
+      throw new Error(rawJson.error || 'Generation failed');
     }
 
-    try {
-      console.log(`[AIService] Requesting constellation for "${subject}"...`);
-
-      const res = await fetch('/api/ai/constellation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subject,
-          provider: settings.provider,
-          ollamaUrl: settings.ollamaUrl,
-          ollamaModel: settings.ollamaModel,
-        }),
-      });
-
-      const rawJson = await res.json();
-      console.log(`[AIService] Server response for "${subject}":`, rawJson);
-
-      // If server signaled that model was unreachable, use clearly-labeled emergency offline fallback
-      if (rawJson.offline) {
-        const fallback = this.generateEmergencyOfflineFallback(subject);
-        constellationCache.set(key, fallback);
-        return fallback;
-      }
-
-      if (rawJson.concepts && Array.isArray(rawJson.concepts) && rawJson.concepts.length > 0) {
-        const result: ConstellationGenerationResult = {
-          subject: rawJson.subject || subject,
-          description: rawJson.description || `Overview of ${subject}.`,
-          quiz: rawJson.quiz,
-          isOfflineFallback: false,
-          concepts: rawJson.concepts.slice(0, 8).map((c: any) => ({
-            name: c.name,
-            description: c.description || `Core branch of ${subject}.`,
-            subConcepts: Array.isArray(c.subConcepts) ? c.subConcepts.slice(0, 4) : [],
-            also_in: Array.isArray(c.also_in) ? c.also_in : undefined,
-            quiz: c.quiz,
-          })),
-        };
-
-        constellationCache.set(key, result);
-        return result;
-      }
-    } catch (err: any) {
-      console.warn(`[AIService network error for "${subject}", using labeled offline fallback]:`, err);
-    }
-
-    // Network completely down / server offline
-    const fallback = this.generateEmergencyOfflineFallback(subject);
-    constellationCache.set(key, fallback);
-    return fallback;
+    const result: ConstellationGenerationResult = {
+      subject: rawJson.subject || subject,
+      description: rawJson.description || `Overview of ${subject}.`,
+      isOfflineFallback: false,
+      concepts: rawJson.concepts.slice(0, 8).map((c: any) => ({
+        name: c.name,
+        description: c.description || `Core branch of ${subject}.`,
+        subConcepts: Array.isArray(c.subConcepts) ? c.subConcepts.slice(0, 4) : [],
+        also_in: Array.isArray(c.also_in) ? c.also_in : undefined,
+      })),
+    };
+    constellationCache.set(key, result);
+    return result;
   }
 
   // Emergency offline generator clearly labeled as "(Offline Fallback)"
