@@ -1,8 +1,76 @@
+# =========================================================
+# SECRETS: never commit these
+# =========================================================
+.env
+.env.*
+*.env
+!.env.example
+secrets.json
+appsettings.*.local.json
+appsettings.Local.json
+*.pem
+*.key
+*.pfx
+*.p12
+*.cer
+*.crt
+id_rsa*
+id_ed25519*
+credentials*.json
+service-account*.json
+
+# =========================================================
+# .NET / Visual Studio / Rider
+# =========================================================
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+[Ll]og/
+[Ll]ogs/
+*.user
+*.suo
+*.userprefs
+*.userosscache
+*.sln.docstates
+.vs/
+.idea/
+*.DotSettings.user
+_ReSharper*/
+TestResults/
+[Tt]est[Rr]esult*/
+*.trx
+coverage/
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+artifacts/
+publish/
+*.nupkg
+*.snupkg
+.nuget/packages/
+project.lock.json
+*.binlog
+
+# =========================================================
+# Node / TypeScript prototype
+# =========================================================
 node_modules/
 build/
 dist/
-coverage/
+server.js
+
+# =========================================================
+# OS / editor
+# =========================================================
 .DS_Store
+Thumbs.db
+*.swp
+*~
 *.log
-.env*
-!.env.example
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json

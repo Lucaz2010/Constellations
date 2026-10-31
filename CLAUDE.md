@@ -66,7 +66,7 @@ dotnet add tests/Constellations.Tests reference src/Constellations.Core
 dotnet add src/Constellations.Core package OllamaSharp
 ```
 
-If `-int Server` is rejected, check `dotnet new blazor --help` (flags vary by SDK version). The `.gitignore` also needs the Visual Studio / .NET entries (`bin/`, `obj/`, `*.user`, `.vs/`).
+If `-int Server` is rejected, check `dotnet new blazor --help` (flags vary by SDK version). The root `.gitignore` already covers .NET build output and secrets.
 
 ## Common commands
 
@@ -125,14 +125,35 @@ SVG on a dark background. Hubs are large coloured circles, stars small circles, 
 "Ollama": { "BaseUrl": "http://localhost:11434", "Model": "gemma4:e4b", "NumCtx": 4096 }
 ```
 
-Never hard-code the model tag or URL. No API keys are needed, and none should be committed.
+Never hard-code the model tag or URL. The app itself needs no API keys. If a secret is ever needed, it goes in `.env` (see "Secrets"), never in `appsettings.json`.
 
 ## Conventions
 
 - C#: nullable reference types enabled, `async`/`await` end to end with `CancellationToken` on AI calls, records for immutable data, file-scoped namespaces.
 - Put logic in `Core` with tests. Razor components only handle presentation and interaction.
 - Add or update xUnit tests for any change to normalisation, merging, JSON parsing or validation.
-- Git: short-lived branches (`feat/ollama-service`, `feat/graph-merge`, `feat/svg-view`), small PRs with one reviewer, Conventional Commit messages. Don't push directly to `main`.
+- Conventional Commit messages (`feat:`, `fix:`, `docs:`, `test:`, `chore:` …).
+
+## Git workflow (mandatory)
+
+**NEVER commit or push directly to `main`, under any circumstances.** All changes go through a pull request.
+
+1. Update main: `git checkout main && git pull`
+2. Create a new feature branch from `main`: `git checkout -b feat/<short-name>` (or `fix/`, `docs/`, `test/`, `chore/`)
+3. Commit on that branch, then push it: `git push -u origin <branch>`
+4. Open a PR into `main` (`gh pr create --base main`) with one reviewer from the team.
+5. Keep branches short-lived and PRs small. Delete the branch after merge.
+
+If you find yourself on `main` with changes, move them to a new branch before committing. Never force-push to `main`.
+
+## Secrets (NEVER expose them)
+
+- Keep all secrets (API keys, tokens, passwords, connection strings) in **`.env` files**. They are git-ignored and must never be committed.
+- Commit only **`.env.example`**, with placeholder values and a comment per variable explaining what it is.
+- Never put secrets in `appsettings.json`, source code, tests, logs, commit messages, PR descriptions, issues or screenshots.
+- Before every commit, check `git status` / `git diff --staged` and make sure no `.env`, key or credential file is staged.
+- If a secret is ever committed or pushed, stop and tell the team right away. The secret must be rotated, because removing it from history alone is not enough.
+- Don't weaken or remove the secret patterns in `.gitignore`.
 
 ## Team split (for context)
 
