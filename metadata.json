@@ -1,0 +1,6 @@
+{
+  "name": "Constellations",
+  "description": "Interactive knowledge map powered by Gemma 4 and AI. Explores subject constellations, overlapping crossover stars, and AI-discovered bridges.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
